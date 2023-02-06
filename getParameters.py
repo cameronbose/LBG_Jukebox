@@ -10,8 +10,8 @@ def getAPIVersion(delphixVersion):
     major,minor,micro = apiVersion.split('.')
     return major,minor,micro  
 
-def getdSourceContainerID(dSourceName): 
-    APIQuery = os.popen(f'curl -X GET -k http://{dxEngineProd}/resources/json/delphix/database -b "cookies.txt" -H "Content-Type: application/json"').read()
+def getdSourceContainerID(dSourceName,engine): 
+    APIQuery = os.popen(f'curl -X GET -k http://{engine}/resources/json/delphix/database -b "cookies.txt" -H "Content-Type: application/json"').read()
     queryDict = json.loads(APIQuery) 
     for db in queryDict["result"]:
         if db['name'] == dSourceName: 
@@ -19,8 +19,8 @@ def getdSourceContainerID(dSourceName):
             print(f"this is it ****************************{dSourceContainer}***************************")
     return dSourceContainer
     
-def getSnapshotID(sourceID): 
-    APIQuery = os.popen(f'curl -X GET -k http://{dxEngineProd}/resources/json/delphix/snapshot?database={sourceID} -b "cookies.txt" -H "Content-Type: application/json"').read()
+def getSnapshotID(sourceID,engine): 
+    APIQuery = os.popen(f'curl -X GET -k http://{engine}/resources/json/delphix/snapshot?database={sourceID} -b "cookies.txt" -H "Content-Type: application/json"').read()
     queryDict = json.loads(APIQuery)
     snapshotList = [db["reference"] for db in queryDict["result"]]
     latestSnapshot = snapshotList[-1]
@@ -62,15 +62,15 @@ if __name__ == "__main__":
     templateReference,templateBranch = getTemplateBranch(templateName)
     print("logging in") 
     os.system(f"sh login.sh {username} {password} {dxEngineProd} {major} {minor} {micro}")
-    sourceID = getdSourceContainerID(dSourceName)
-    vdbID = getdSourceContainerID(vdbName)
+    sourceID = getdSourceContainerID(dSourceName,dxEngineProd)
+    vdbID = getdSourceContainerID(vdbName,dxEngineProd)
     specID = getReplicationSpec(replicationName)
     
     print("Creating Snapshot of dSource.")
     os.system(f"sh snapshot.sh {dxEngineProd} {sourceID} {vdbID}")
-    time.sleep(120)
+    time.sleep(180)
     
-    latestSnap = getSnapshotID(sourceID)
+    latestSnap = getSnapshotID(sourceID,dxEngineProd)
     print(latestSnap)
     
     print("Refreshing masked vdb in PROD environment to latest Snapshot just taken & then replicating to Non-Prod Environment.")
@@ -78,7 +78,9 @@ if __name__ == "__main__":
     time.sleep(200)
     
     os.system(f"sh login.sh 'admin' 'Fwdview01!' {dxEngineNonProd} {major} {minor} {micro}")
-    templateID = getdSourceContainerID("Template_VDB")
-    templateLatestSnap = getSnapshotID(templateID)
+    templateID = getdSourceContainerID("Template_VDB",dxEngineNonProd)
+    templateLatestSnap = getSnapshotID(templateID,dxEngineNonProd)
+    # do we need the snapID? 
+    print(f"{templateID} && {templateLatestSnap}")
     print("Refreshing template vdb & creating bookmark on template.")
-    os.system(f"sh second.sh {dxEngineNonProd} {templateID} {templateLatestSnap} {major} {minor} {micro} {templateReference} {templateBranch}")
+    os.system(f"sh second.sh {dxEngineNonProd} {templateID} {templateReference} {templateBranch}")

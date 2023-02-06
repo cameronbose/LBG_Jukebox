@@ -19,7 +19,7 @@ curl -s -X POST -k --data @- http://${dxEngineProd}/resources/json/delphix/datab
 {"timeflowPointParameters":{"snapshot":"${latestSnap}","type":"TimeflowPointSnapshot"},"type":"RefreshParameters"}
 EOF
 
-sleep 100
+sleep 280
 
 curl -s -X POST -k --data @- http://${dxEngineProd}/resources/json/delphix/replication/spec/${specID}/execute -b "cookies.txt" -H "Content-Type: application/json"<<EOF
 {}
