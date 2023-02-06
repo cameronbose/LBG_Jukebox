@@ -44,8 +44,8 @@ def getTemplateBranch(templateName):
     print(f"{templateReference} & {templateBranch}")
     return templateReference,templateBranch 
 
-
 if __name__ == "__main__": 
+    
     username = "admin"
     password = "fwdview01!"
     dxEngineProd = sys.argv[1]
@@ -57,6 +57,7 @@ if __name__ == "__main__":
     templateName = sys.argv[7]
     major,minor,micro = getAPIVersion(dxVersion)
     
+    print("Getting reference ID's for API POST calls. ")
     os.system(f"sh login.sh 'admin' 'Fwdview01!' {dxEngineNonProd} {major} {minor} {micro}")
     templateReference,templateBranch = getTemplateBranch(templateName)
     print("logging in") 
@@ -64,16 +65,20 @@ if __name__ == "__main__":
     sourceID = getdSourceContainerID(dSourceName)
     vdbID = getdSourceContainerID(vdbName)
     specID = getReplicationSpec(replicationName)
+    
+    print("Creating Snapshot of dSource.")
     os.system(f"sh snapshot.sh {dxEngineProd} {sourceID} {vdbID}")
-
-
     time.sleep(120)
+    
     latestSnap = getSnapshotID(sourceID)
     print(latestSnap)
     
-    os.system(f"sh commands.sh {dxEngineProd} {dxEngineNonProd} {sourceID} {vdbID} {latestSnap} {specID} {major} {minor} {micro} {templateReference} {templateBranch}")
-
-
-
-
-# 2 more API's - replicate it then bookmark the template
+    print("Refreshing masked vdb in PROD environment to latest Snapshot just taken & then replicating to Non-Prod Environment.")
+    os.system(f"sh first.sh {dxEngineProd} {vdbID} {latestSnap} {specID} {major} {minor} {micro}")
+    time.sleep(200)
+    
+    os.system(f"sh login.sh 'admin' 'Fwdview01!' {dxEngineNonProd} {major} {minor} {micro}")
+    templateID = getdSourceContainerID("Template_VDB")
+    templateLatestSnap = getSnapshotID(templateID)
+    print("Refreshing template vdb & creating bookmark on template.")
+    os.system(f"sh second.sh {dxEngineNonProd} {templateID} {templateLatestSnap} {major} {minor} {micro} {templateReference} {templateBranch}")

@@ -1,16 +1,10 @@
 #!/bin/bash 
 
-dxEngineProd=$1 
-shift
 dxEngineNonProd=$1
-shift
-sourceID=$1
 shift 
-vdbID=$1
+templateID=$1
 shift
-latestSnap=$1
-shift 
-specID=$1
+templateLatestSnap=$1
 shift 
 major=$1
 shift
@@ -21,16 +15,6 @@ shift
 templateReference=$1
 shift
 templateBranch=$1
-
-curl -s -X POST -k --data @- http://${dxEngineProd}/resources/json/delphix/database/${vdbID}/refresh -b "cookies.txt" -H "Content-Type: application/json"<<EOF
-{"timeflowPointParameters":{"snapshot":"${latestSnap}","type":"TimeflowPointSnapshot"},"type":"RefreshParameters"}
-EOF
-
-curl -s -X POST -k --data @- http://${dxEngineProd}/resources/json/delphix/replication/spec/${specID}/execute -b "cookies.txt" -H "Content-Type: application/json"<<EOF
-{}
-EOF
-
-sleep 200 
 
 curl -s -X POST -k --data @- http://${dxEngineNonProd}/resources/json/delphix/session \
    -c "cookies.txt" -H "Content-Type: application/json" <<EOF
@@ -53,6 +37,12 @@ curl -s -X POST -k --data @- http://${dxEngineNonProd}/resources/json/delphix/lo
 "password": "Fwdview01!"
 }
 EOF
+
+curl -s -X POST -k --data @- http://${dxEngineNonProd}/resources/json/delphix/database/${templateID}/refresh -b "cookies.txt" -H "Content-Type: application/json"<<EOF
+{"timeflowPointParameters":{"snapshot":"${templateLatestSnap}","type":"TimeflowPointSnapshot"},"type":"RefreshParameters"}
+EOF
+
+sleep 100 
 
 current_date_time="$(date +'%Y-%m-%d %H:%M:%S')"
 
