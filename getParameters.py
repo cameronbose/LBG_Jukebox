@@ -3,6 +3,20 @@ import json
 import sys 
 import time 
 
+dxEngineProd = sys.argv[1]
+dxEngineNonProd = sys.argv[2]
+dxVersion = sys.argv[3]
+dSourceName = sys.argv[4]
+vdbName = sys.argv[5]
+replicationName = sys.argv[6]
+templateName = sys.argv[7]
+templateVDBName = sys.argv[8]
+prod_username = sys.argv[9]
+prod_password = sys.argv[10]
+non_prod_username = sys.argv[11]
+non_prod_password = sys.argv[12]
+action = sys.argv[13]
+
 versionDict = {'6.0.14.0':'1.11.14','6.0.15.0':'1.11.15','6.0.16.0':'1.11.16','6.0.17.0':'1.11.17'}
 
 def getAPIVersion(delphixVersion):
@@ -76,72 +90,46 @@ def checkActionLoop(action,engine):
         else:
             print("Not yet Completed, check again in 10 seconds")
             time.sleep(10)
+
 if __name__ == "__main__": 
     
-    dxEngineProd = sys.argv[1]
-    dxEngineNonProd = sys.argv[2]
-    dxVersion = sys.argv[3]
-    dSourceName = sys.argv[4]
-    vdbName = sys.argv[5]
-    replicationName = sys.argv[6]
-    templateName = sys.argv[7]
-    templateVDBName = sys.argv[8]
-    prod_username = sys.argv[9]
-    prod_password = sys.argv[10]
-    non_prod_username = sys.argv[11]
-    non_prod_password = sys.argv[12]
+    if action == "snapshot_dSource": 
+        print("Creating snapshot of dSource.")
+        major,minor,micro = getAPIVersion(dxVersion) 
+        os.system(f"sh login.sh {prod_username} {prod_password} {dxEngineProd} {major} {minor} {micro}")
+        sourceID = getdSourceContainerID(dSourceName,dxEngineProd)
+        os.system(f"sh snapshot.sh {dxEngineProd} {sourceID}")
+        action = getAction()
+        checkActionLoop(action,dxEngineProd)
+        time.sleep(5)
 
-    major,minor,micro = getAPIVersion(dxVersion)
+    if action == "refreshVDBProd": 
+        print("Refreshing masked vdb in PROD environment to latest Snapshot.")
+        vdbID = getdSourceContainerID(vdbName,dxEngineProd)
+        latestSnap = getSnapshotID(sourceID,dxEngineProd)
+        os.system(f"sh refreshVDBProd.sh {dxEngineProd} {vdbID} {latestSnap}")
+        action = getAction()
+        checkActionLoop(action,dxEngineProd)
     
-    print("Getting reference ID's for API POST calls. ")
-    os.system(f"sh login.sh {non_prod_username} {non_prod_password} {dxEngineNonProd} {major} {minor} {micro}")
-    templateReference,templateBranch = getTemplateBranch(templateName)
+    if action == "replicate": 
+        print("Replicating to Non-Prod Environment.")
+        specID = getReplicationSpec(replicationName)
+        os.system(f"sh replicate.sh {dxEngineProd} {specID}")
+        action = getAction()
+        checkActionLoop(action,dxEngineProd)
     
-    print("logging in") 
-    os.system(f"sh login.sh {prod_username} {prod_password} {dxEngineProd} {major} {minor} {micro}")
+    if action == "refreshTemplate": 
+        print("Refreshing Non-Prod Template VDB.")
+        major,minor,micro = getAPIVersion(dxVersion)
+        os.system(f"sh login.sh {non_prod_username} {non_prod_password} {dxEngineNonProd} {major} {minor} {micro}")
+        templateID = getdSourceContainerID(templateVDBName,dxEngineNonProd)
+        os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID}")
+        action = getAction()
+        checkActionLoop(action,dxEngineNonProd)
     
-    sourceID = getdSourceContainerID(dSourceName,dxEngineProd)
-    vdbID = getdSourceContainerID(vdbName,dxEngineProd)
-    specID = getReplicationSpec(replicationName)
-    
-    print("Creating Snapshot of dSource.")
-    os.system(f"sh snapshot.sh {dxEngineProd} {sourceID}")
-    
-    action = getAction()
-    checkActionLoop(action,dxEngineProd)
-    
-    time.sleep(5)
-
-    latestSnap = getSnapshotID(sourceID,dxEngineProd)
-    print(latestSnap)
-    
-    print("Refreshing masked vdb in PROD environment to latest Snapshot.")
-    os.system(f"sh refreshVDBProd.sh {dxEngineProd} {vdbID} {latestSnap}")
-    
-    action = getAction()
-    checkActionLoop(action,dxEngineProd)
-    
-    print("Replicating to Non-Prod Environment.")
-    os.system(f"sh replicate.sh {dxEngineProd} {specID}")
-
-    action = getAction()
-    checkActionLoop(action,dxEngineProd)
-
-
-    os.system(f"sh login.sh {non_prod_username} {non_prod_password} {dxEngineNonProd} {major} {minor} {micro}")
-    templateID = getdSourceContainerID(templateVDBName,dxEngineNonProd)
-    templateReference,templateBranch = getTemplateBranch(templateName)
-    # templateLatestSnap = getSnapshotID(templateID,dxEngineNonProd)
-    # # do we need the snapID? 
-    # print(f"{templateID} && {templateLatestSnap}")
-    # print("Refreshing template vdb & creating bookmark on template.")
-    print("Refreshing Non-Prod Template VDB.")
-    os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID}")
-    
-    action = getAction()
-    checkActionLoop(action,dxEngineNonProd)
-    print("Creating bookmark on Template.")
-    os.system(f"sh bookmark.sh {dxEngineNonProd} {templateReference} {templateBranch}")
-    
-    action = getAction()
-    checkActionLoop(action,dxEngineNonProd)
+    if action == "createBookmark": 
+        print("Creating bookmark of Template.")   
+        templateReference,templateBranch = getTemplateBranch(templateName)
+        os.system(f"sh bookmark.sh {dxEngineNonProd} {templateReference} {templateBranch}")
+        action = getAction()
+        checkActionLoop(action,dxEngineNonProd)
