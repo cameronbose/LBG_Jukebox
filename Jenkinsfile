@@ -28,7 +28,7 @@ pipeline {
                 bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName} ${params.vdbProdName} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} replicate";    
             }
         }
-        stage("Refreshing Template: ${params.templateName}.") { 
+        stage("Refreshing Template on Non Prod Engine.") { 
             steps {
                 bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName} ${params.vdbProdName} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} refreshTemplate";    
             }
