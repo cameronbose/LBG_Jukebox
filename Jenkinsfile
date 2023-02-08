@@ -8,14 +8,14 @@ pipeline {
     stages { 
         stage('Git Checkout') {
             steps {
-                //bat 'rmdir /s /q LBG_Toolchain'; 
+                bat 'rmdir /s /q LBG_Toolchain'; 
                 bat 'git clone https://github.com/cameronbose/LBG_Toolchain.git';
             }
         }
         
         stage("Executing API commands") { 
             steps {
-                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName} ${params.vdbProdName}, ${params.replicationName} ${params.templateName} ${params.templateVDBName} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW}";    
+                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName} ${params.vdbProdName} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW}";    
             }
         } 
     }
