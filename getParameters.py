@@ -105,6 +105,8 @@ if __name__ == "__main__":
 
     if action == "refreshVDBProd": 
         print("Refreshing masked vdb in PROD environment to latest Snapshot.")
+        major,minor,micro = getAPIVersion(dxVersion) 
+        os.system(f"sh login.sh {prod_username} {prod_password} {dxEngineProd} {major} {minor} {micro}")
         vdbID = getdSourceContainerID(vdbName,dxEngineProd)
         sourceID = getdSourceContainerID(dSourceName,dxEngineProd)
         latestSnap = getSnapshotID(sourceID,dxEngineProd)
@@ -114,6 +116,8 @@ if __name__ == "__main__":
     
     if action == "replicate": 
         print("Replicating to Non-Prod Environment.")
+        major,minor,micro = getAPIVersion(dxVersion) 
+        os.system(f"sh login.sh {prod_username} {prod_password} {dxEngineProd} {major} {minor} {micro}")      
         specID = getReplicationSpec(replicationName)
         os.system(f"sh replicate.sh {dxEngineProd} {specID}")
         action = getAction()
@@ -129,7 +133,9 @@ if __name__ == "__main__":
         checkActionLoop(action,dxEngineNonProd)
     
     if action == "createBookmark": 
-        print("Creating bookmark of Template.")   
+        print("Creating bookmark of Template.") 
+        major,minor,micro = getAPIVersion(dxVersion)
+        os.system(f"sh login.sh {non_prod_username} {non_prod_password} {dxEngineNonProd} {major} {minor} {micro}")  
         templateReference,templateBranch = getTemplateBranch(templateName)
         os.system(f"sh bookmark.sh {dxEngineNonProd} {templateReference} {templateBranch}")
         action = getAction()
