@@ -13,12 +13,12 @@ pipeline {
             }
         }
         
-        stage("Creating Snapshot of dSource: ${params.dSourceName}.") { 
+        stage("Creating Snapshot of dSource on Prod Engine.") { 
             steps {
                 bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName} ${params.vdbProdName} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} snapshot_dSource";    
             }
         } 
-        stage("Refreshing VDB: ${params.vdbProdName}.") { 
+        stage("Refreshing masked VDB.") { 
             steps {
                 bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName} ${params.vdbProdName} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} refreshVDBProd";    
             }
