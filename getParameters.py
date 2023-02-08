@@ -106,6 +106,7 @@ if __name__ == "__main__":
     if action == "refreshVDBProd": 
         print("Refreshing masked vdb in PROD environment to latest Snapshot.")
         vdbID = getdSourceContainerID(vdbName,dxEngineProd)
+        sourceID = getdSourceContainerID(dSourceName,dxEngineProd)
         latestSnap = getSnapshotID(sourceID,dxEngineProd)
         os.system(f"sh refreshVDBProd.sh {dxEngineProd} {vdbID} {latestSnap}")
         action = getAction()
