@@ -2,22 +2,29 @@ import os
 import json 
 import sys 
 import time 
+import threading
 
 dxEngineProd = sys.argv[1]
 dxEngineNonProd = sys.argv[2]
 dxVersion = sys.argv[3]
-dSourceName = sys.argv[4]
-vdbName = sys.argv[5]
-replicationName = sys.argv[6]
-templateName = sys.argv[7]
-templateVDBName = sys.argv[8]
-prod_username = sys.argv[9]
-prod_password = sys.argv[10]
-non_prod_username = sys.argv[11]
-non_prod_password = sys.argv[12]
-action = sys.argv[13]
+dSourceName_1 = sys.argv[4]
+dSourceName_2 = sys.argv[5]
+vdbName_1 = sys.argv[6]
+vdbName_2 = sys.argv[7]
+replicationName = sys.argv[8]
+templateName = sys.argv[9]
+templateVDBName_1 = sys.argv[10]
+templateVDBName_2 = sys.argv[11]
+prod_username = sys.argv[12]
+prod_password = sys.argv[13]
+non_prod_username = sys.argv[14]
+non_prod_password = sys.argv[15]
+action = sys.argv[16]
 
 versionDict = {'6.0.14.0':'1.11.14','6.0.15.0':'1.11.15','6.0.16.0':'1.11.16','6.0.17.0':'1.11.17'}
+
+def run_command(command):
+    os.system(command)
 
 def getAPIVersion(delphixVersion):
     apiVersion = versionDict[delphixVersion]
@@ -97,8 +104,23 @@ if __name__ == "__main__":
         print("Creating snapshot of dSource.")
         major,minor,micro = getAPIVersion(dxVersion) 
         os.system(f"sh login.sh {prod_username} {prod_password} {dxEngineProd} {major} {minor} {micro}")
-        sourceID = getdSourceContainerID(dSourceName,dxEngineProd)
-        os.system(f"sh snapshot.sh {dxEngineProd} {sourceID}")
+        sourceID_1 = getdSourceContainerID(dSourceName_1,dxEngineProd)
+        sourceID_2 = getdSourceContainerID(dSourceName_2,dxEngineProd)
+        
+        # # create two threads
+        # thread1 = threading.Thread(target=run_command, args=(f"sh snapshot.sh {dxEngineProd} {sourceID_1}",))
+        # thread2 = threading.Thread(target=run_command, args=(f"sh snapshot.sh {dxEngineProd} {sourceID_2}",))
+
+        # # start the threads almost simultaneously
+        # thread1.start()
+        # thread2.start()
+
+        # # wait for both threads to complete
+        # thread1.join()
+        # thread2.join()
+        
+        os.system(f"sh snapshot.sh {dxEngineProd} {sourceID_1}")
+        os.system(f"sh snapshot.sh {dxEngineProd} {sourceID_2}")
         action = getAction()
         checkActionLoop(action,dxEngineProd)
         time.sleep(5)
@@ -107,10 +129,14 @@ if __name__ == "__main__":
         print("Refreshing masked vdb in PROD environment to latest Snapshot.")
         major,minor,micro = getAPIVersion(dxVersion) 
         os.system(f"sh login.sh {prod_username} {prod_password} {dxEngineProd} {major} {minor} {micro}")
-        vdbID = getdSourceContainerID(vdbName,dxEngineProd)
-        sourceID = getdSourceContainerID(dSourceName,dxEngineProd)
-        latestSnap = getSnapshotID(sourceID,dxEngineProd)
-        os.system(f"sh refreshVDBProd.sh {dxEngineProd} {vdbID} {latestSnap}")
+        vdbID_1 = getdSourceContainerID(vdbName_1,dxEngineProd)
+        vdbID_2 = getdSourceContainerID(vdbName_2,dxEngineProd)
+        sourceID_1 = getdSourceContainerID(dSourceName_1,dxEngineProd)
+        sourceID_2 = getdSourceContainerID(dSourceName_2,dxEngineProd)
+        latestSnap_1 = getSnapshotID(sourceID_1,dxEngineProd)
+        latestSnap_2 = getSnapshotID(sourceID_2,dxEngineProd)
+        os.system(f"sh refreshVDBProd.sh {dxEngineProd} {vdbID_1} {latestSnap_1}")
+        os.system(f"sh refreshVDBProd.sh {dxEngineProd} {vdbID_2} {latestSnap_2}")
         action = getAction()
         checkActionLoop(action,dxEngineProd)
     
@@ -127,8 +153,10 @@ if __name__ == "__main__":
         print("Refreshing Non-Prod Template VDB.")
         major,minor,micro = getAPIVersion(dxVersion)
         os.system(f"sh login.sh {non_prod_username} {non_prod_password} {dxEngineNonProd} {major} {minor} {micro}")
-        templateID = getdSourceContainerID(templateVDBName,dxEngineNonProd)
-        os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID}")
+        templateID_1 = getdSourceContainerID(templateVDBName_1,dxEngineNonProd)
+        templateID_2 = getdSourceContainerID(templateVDBName_2,dxEngineNonProd)
+        os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID_1}")
+        os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID_2}")
         action = getAction()
         checkActionLoop(action,dxEngineNonProd)
     
