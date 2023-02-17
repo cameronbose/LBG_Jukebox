@@ -163,8 +163,8 @@ if __name__ == "__main__":
         os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID_2}")
         action_1 = getAction(templateID_1)
         action_2 = getAction(templateID_2)
-        checkActionLoop(action_1,dxEngineProd)
-        checkActionLoop(action_2,dxEngineProd)
+        checkActionLoop(action_1,dxEngineNonProd)
+        checkActionLoop(action_2,dxEngineNonProd)
     
     if action == "createBookmark": 
         print("Creating bookmark of Template.") 
