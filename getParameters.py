@@ -80,8 +80,8 @@ def checkAction(action,engine):
             else: 
                 return False
 
-def getAction():
-    response = open("response.txt", "r").read()
+def getAction(sourceID):
+    response = open(f"{sourceID}.txt", "r").read()
     responseJson = json.loads(response)
     action = responseJson["action"] 
     return action
@@ -121,8 +121,10 @@ if __name__ == "__main__":
         
         os.system(f"sh snapshot.sh {dxEngineProd} {sourceID_1}")
         os.system(f"sh snapshot.sh {dxEngineProd} {sourceID_2}")
-        action = getAction()
-        checkActionLoop(action,dxEngineProd)
+        action_1 = getAction(sourceID_1)
+        action_2 = getAction(sourceID_2)
+        checkActionLoop(action_1,dxEngineProd)
+        checkActionLoop(action_2,dxEngineProd)
         time.sleep(5)
 
     if action == "refreshVDBProd": 
@@ -137,8 +139,10 @@ if __name__ == "__main__":
         latestSnap_2 = getSnapshotID(sourceID_2,dxEngineProd)
         os.system(f"sh refreshVDBProd.sh {dxEngineProd} {vdbID_1} {latestSnap_1}")
         os.system(f"sh refreshVDBProd.sh {dxEngineProd} {vdbID_2} {latestSnap_2}")
-        action = getAction()
-        checkActionLoop(action,dxEngineProd)
+        action_1 = getAction(vdbID_1)
+        action_2 = getAction(vdbID_2)
+        checkActionLoop(action_1,dxEngineProd)
+        checkActionLoop(action_2,dxEngineProd)
     
     if action == "replicate": 
         print("Replicating to Non-Prod Environment.")
@@ -157,8 +161,10 @@ if __name__ == "__main__":
         templateID_2 = getdSourceContainerID(templateVDBName_2,dxEngineNonProd)
         os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID_1}")
         os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID_2}")
-        action = getAction()
-        checkActionLoop(action,dxEngineNonProd)
+        action_1 = getAction(templateID_1)
+        action_2 = getAction(templateID_2)
+        checkActionLoop(action_1,dxEngineProd)
+        checkActionLoop(action_2,dxEngineProd)
     
     if action == "createBookmark": 
         print("Creating bookmark of Template.") 

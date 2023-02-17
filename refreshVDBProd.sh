@@ -11,4 +11,4 @@ response=$(curl -s -X POST -k --data @- http://${dxEngineProd}/resources/json/de
 {"timeflowPointParameters":{"snapshot":"${latestSnap}","type":"TimeflowPointSnapshot"},"type":"RefreshParameters"}
 EOF)
 
-echo "${response}" > response.txt
+echo "${response}" > ${vdbID}.txt

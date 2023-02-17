@@ -9,4 +9,4 @@ response=$(curl -s -X POST -k --data @- http://${dxEngine}/resources/json/delphi
 {"compressionEnabled":false,"type":"MSSqlNewCopyOnlyFullBackupSyncParameters"}
 EOF) 
 
-echo "${response}" > response.txt
+echo "${response}" > ${sourceID}.txt

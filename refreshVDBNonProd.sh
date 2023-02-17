@@ -10,5 +10,5 @@ response=$(curl -s -X POST -k --data @- http://${dxEngineNonProd}/resources/json
 {"type":"RefreshParameters","timeflowPointParameters":{"type":"TimeflowPointSemantic"}}
 EOF)
 
-echo "${response}" > response.txt 
+echo "${response}" > ${templateID}.txt 
 
