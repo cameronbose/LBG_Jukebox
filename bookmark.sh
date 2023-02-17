@@ -24,4 +24,4 @@ response=$(curl -s -X POST -k --data @- http://${dxEngineNonProd}/resources/json
 }
 EOF)
 
-echo "${response}" > response.txt
+echo "${response}" > ${templateReference}.txt

@@ -9,4 +9,4 @@ response=$(curl -s -X POST -k --data @- http://${dxEngineProd}/resources/json/de
 {}
 EOF)
 
-echo "${response}" > response.txt
+echo "${response}" > ${specID}.txt

@@ -150,7 +150,7 @@ if __name__ == "__main__":
         os.system(f"sh login.sh {prod_username} {prod_password} {dxEngineProd} {major} {minor} {micro}")      
         specID = getReplicationSpec(replicationName)
         os.system(f"sh replicate.sh {dxEngineProd} {specID}")
-        action = getAction()
+        action = getAction(specID)
         checkActionLoop(action,dxEngineProd)
     
     if action == "refreshTemplate": 
@@ -172,5 +172,5 @@ if __name__ == "__main__":
         os.system(f"sh login.sh {non_prod_username} {non_prod_password} {dxEngineNonProd} {major} {minor} {micro}")  
         templateReference,templateBranch = getTemplateBranch(templateName)
         os.system(f"sh bookmark.sh {dxEngineNonProd} {templateReference} {templateBranch}")
-        action = getAction()
+        action = getAction(templateReference)
         checkActionLoop(action,dxEngineNonProd)
