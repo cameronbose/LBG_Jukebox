@@ -166,8 +166,10 @@ if __name__ == "__main__":
         major,minor,micro = getAPIVersion(dxVersion)
         os.system(f"sh login.sh {non_prod_username} {non_prod_password} {dxEngineNonProd} {major} {minor} {micro}")
         containerID = getContainerID(containerName,dxEngineNonProd)
-        os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {containerID}")
+        print(f"This is it: {containerID}")
+        print(os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {containerID}"))
         action = getAction(containerID)
+        print(action)
         checkActionLoop(action,dxEngineNonProd)
     
     if action == "createBookmark": 
