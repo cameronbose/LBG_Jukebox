@@ -5,9 +5,9 @@ shift
 containerID=$1
 shift 
 
-response=$(curl -s -X POST -k --data @- http://${dxEngineNonProd}/resources/json/delphix/selfservice/${containerID}/refresh \
+response=$(curl -s -X POST -k --data @- http://${dxEngineNonProd}/resources/json/delphix/selfservice/container/${containerID}/refresh \
 -b "cookies.txt" -H "Content-Type: application/json"<<EOF
-{"type":"JSDataContainerRefreshParameters","forceOption":false}
+{"type": "JSDataContainerRefreshParameters","forceOption": false}
 EOF)
 
 echo "${response}" > ${containerID}.txt 
