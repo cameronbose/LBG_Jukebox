@@ -54,15 +54,15 @@ def getReplicationSpec(replicationName):
             specID = replication["reference"]
     return specID
 
-def getTemplateBranch(templateName): 
-    APIQuery = os.popen(f'curl -X GET -k http://{dxEngineNonProd}/resources/json/delphix/selfservice/template -b "cookies.txt" -H "Content-Type: application/json"').read()
+def getContainerBranch(containerName): 
+    APIQuery = os.popen(f'curl -X GET -k http://{dxEngineNonProd}/resources/json/delphix/selfservice/container -b "cookies.txt" -H "Content-Type: application/json"').read()
     queryDict = json.loads(APIQuery)
-    for template in queryDict["result"]:
-        if template['name'] == templateName: 
-            templateReference = template["reference"]
-            templateBranch = template["activeBranch"]
-    print(f"{templateReference} & {templateBranch}")
-    return templateReference,templateBranch 
+    for container in queryDict["result"]:
+        if container['name'] == containerName: 
+            containerReference = container["reference"]
+            containerBranch = container["activeBranch"]
+    print(f"{containerReference} & {containerBranch}")
+    return containerReference,containerBranch 
 
 def checkAction(action,engine): 
     APIQuery = os.popen(f'curl -X GET -k http://{engine}/resources/json/delphix/action -b "cookies.txt" -H "Content-Type: application/json"').read()
@@ -176,7 +176,7 @@ if __name__ == "__main__":
         print("Creating bookmark of Template.") 
         major,minor,micro = getAPIVersion(dxVersion)
         os.system(f"sh login.sh {non_prod_username} {non_prod_password} {dxEngineNonProd} {major} {minor} {micro}")  
-        templateReference,templateBranch = getTemplateBranch(templateName)
+        templateReference,templateBranch = getContainerBranch(ContainerName)
         os.system(f"sh bookmark.sh {dxEngineNonProd} {templateReference} {templateBranch}")
         action = getAction(templateReference)
         checkActionLoop(action,dxEngineNonProd)
