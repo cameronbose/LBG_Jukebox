@@ -1,4 +1,4 @@
-properties([parameters([string(defaultValue: '10.44.1.112', name: 'dxEngineProd', trim: true), string(defaultValue: '10.44.1.122', name: 'dxEngineNonProd', trim: true), choice(choices: ['6.0.14.0', '6.0.15.0', '6.0.16.0', '6.0.17.0'], name: 'dxVersion'), string(defaultValue: 'AdventureWorks2016', name: 'dSourceName_1', trim: true), string(defaultValue: 'WideWorldImporters', name: 'dSourceName_2', trim: true), string(defaultValue: 'FN', name: 'vdbProdName_1', trim: true), string(defaultValue: 'DM', name: 'vdbProdName_2', trim: true), string(defaultValue: 'LBG 2 dSource Replication', name: 'replicationName', trim: true), string(defaultValue: '2-dSource Template', name: 'templateName', trim: true), string(defaultValue: 'FN_Child', name: 'templateVDBName_1', trim: true), string(defaultValue: 'DM_Child', name: 'templateVDBName_2', trim: true)])])
+properties([parameters([string(defaultValue: '10.44.1.112', name: 'dxEngineProd', trim: true), string(defaultValue: '10.44.1.122', name: 'dxEngineNonProd', trim: true), choice(choices: ['6.0.14.0', '6.0.15.0', '6.0.16.0', '6.0.17.0'], name: 'dxVersion'), string(defaultValue: 'AdventureWorks2016', name: 'dSourceName_1', trim: true), string(defaultValue: 'WideWorldImporters', name: 'dSourceName_2', trim: true), string(defaultValue: 'FN', name: 'vdbProdName_1', trim: true), string(defaultValue: 'DM', name: 'vdbProdName_2', trim: true), string(defaultValue: 'LBG 2 dSource Replication', name: 'replicationName', trim: true), string(defaultValue: '2-dSource Template', name: 'templateName', trim: true), string(defaultValue: 'Jukebox', name: 'containerName', trim: true)])])
 pipeline { 
     agent any 
     environment { 
@@ -15,27 +15,27 @@ pipeline {
         
         stage("Creating Snapshot of dSource on Prod Engine.") { 
             steps {
-                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName_1} ${params.templateVDBName_2} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} snapshot_dSource";    
+                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.containerName} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} snapshot_dSource";    
             }
         } 
         stage("Refreshing masked VDB.") { 
             steps {
-                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName_1} ${params.templateVDBName_2} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} refreshVDBProd";    
+                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.containerName} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} refreshVDBProd";    
             }
         }
         stage("Replicating to Non Prod Engine.") { 
             steps {
-                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName_1} ${params.templateVDBName_2} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} replicate";    
+                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.containerName} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} replicate";    
             }
         }
-        stage("Refreshing Template on Non Prod Engine.") { 
+        stage("Refreshing Container on Non Prod Engine.") { 
             steps {
-                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName_1} ${params.templateVDBName_2} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} refreshTemplate";    
+                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.containerName} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} refreshContainer";    
             }
         }
         stage("Creating Bookmark.") { 
             steps {
-                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName_1} ${params.templateVDBName_2} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} createBookmark";    
+                bat "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.containerName} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} createBookmark";    
             }
         }   
     }
