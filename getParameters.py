@@ -87,6 +87,7 @@ def getAction(sourceID):
 
 def getContainerID(containerName,engine): 
     APIQuery = os.popen(f'curl -X GET -k http://{engine}/resources/json/delphix/selfservice/container -b "cookies.txt" -H "Content-Type: application/json"').read()
+    print(APIQuery)
     queryDict = json.loads(APIQuery)
     for container in queryDict["result"]:
         if container['name'] == containerName: 
