@@ -176,7 +176,7 @@ if __name__ == "__main__":
         print("Creating bookmark of Template.") 
         major,minor,micro = getAPIVersion(dxVersion)
         os.system(f"sh login.sh {non_prod_username} {non_prod_password} {dxEngineNonProd} {major} {minor} {micro}")  
-        containerReference,containerBranch = getContainerBranch(ContainerName)
+        containerReference,containerBranch = getContainerBranch(containerName)
         os.system(f"sh bookmark.sh {dxEngineNonProd} {containerReference} {containerBranch}")
         action = getAction(containerReference)
         checkActionLoop(action,dxEngineNonProd)
