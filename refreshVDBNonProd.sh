@@ -2,13 +2,13 @@
 
 dxEngineNonProd=$1
 shift 
-templateID=$1
+containerID=$1
 shift 
 
-response=$(curl -s -X POST -k --data @- http://${dxEngineNonProd}/resources/json/delphix/database/${templateID}/refresh \
+response=$(curl -s -X POST -k --data @- http://${dxEngineNonProd}/resources/json/delphix/selfservice/${containerID}/refresh \
 -b "cookies.txt" -H "Content-Type: application/json"<<EOF
-{"type":"RefreshParameters","timeflowPointParameters":{"type":"TimeflowPointSemantic"}}
+{"type":"JSDataContainerRefreshParameters","forceOption":false}
 EOF)
 
-echo "${response}" > ${templateID}.txt 
+echo "${response}" > ${containerID}.txt 
 
