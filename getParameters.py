@@ -13,13 +13,12 @@ vdbName_1 = sys.argv[6]
 vdbName_2 = sys.argv[7]
 replicationName = sys.argv[8]
 templateName = sys.argv[9]
-templateVDBName_1 = sys.argv[10]
-templateVDBName_2 = sys.argv[11]
-prod_username = sys.argv[12]
-prod_password = sys.argv[13]
-non_prod_username = sys.argv[14]
-non_prod_password = sys.argv[15]
-action = sys.argv[16]
+containerName = sys.argv[10]
+prod_username = sys.argv[11]
+prod_password = sys.argv[12]
+non_prod_username = sys.argv[13]
+non_prod_password = sys.argv[14]
+action = sys.argv[15]
 
 versionDict = {'6.0.14.0':'1.11.14','6.0.15.0':'1.11.15','6.0.16.0':'1.11.16','6.0.17.0':'1.11.17'}
 
@@ -165,14 +164,10 @@ if __name__ == "__main__":
         print("Refreshing Non-Prod Container.")
         major,minor,micro = getAPIVersion(dxVersion)
         os.system(f"sh login.sh {non_prod_username} {non_prod_password} {dxEngineNonProd} {major} {minor} {micro}")
-        containerID_1 = getContainerID(containerName_1,dxEngineNonProd)
-        containerID_2 = getContainerID(containerName_2,dxEngineNonProd)
-        os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID_1}")
-        os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID_2}")
-        action_1 = getAction(templateID_1)
-        action_2 = getAction(templateID_2)
-        checkActionLoop(action_1,dxEngineNonProd)
-        checkActionLoop(action_2,dxEngineNonProd)
+        containerID = getContainerID(containerName,dxEngineNonProd)
+        os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {containerID}")
+        action = getAction(containerID)
+        checkActionLoop(action,dxEngineNonProd)
     
     if action == "createBookmark": 
         print("Creating bookmark of Template.") 
