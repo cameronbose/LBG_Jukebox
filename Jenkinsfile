@@ -8,7 +8,7 @@ pipeline {
     stages { 
         stage('Git Checkout') {
             steps {
-                //bat 'rmdir /s /q LBG_Toolchain'; 
+                bat 'rmdir /s /q LBG_Toolchain'; 
                 bat 'git clone https://github.com/cameronbose/LBG_Toolchain.git';
             }
         }
