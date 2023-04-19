@@ -15,7 +15,7 @@ pipeline {
         
         stage("Creating Snapshot of dSource on Prod Engine.") { 
             steps {
-                sh "python getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName_1} ${params.templateVDBName_2} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} snapshot_dSource";    
+                sh "python3 getParameters.py ${params.dxEngineProd} ${params.dxEngineNonProd} ${params.dxVersion} ${params.dSourceName_1} ${params.dSourceName_2} ${params.vdbProdName_1} ${params.vdbProdName_2} \"${params.replicationName}\" \"${params.templateName}\" ${params.templateVDBName_1} ${params.templateVDBName_2} ${PROD_ENGINE_USR} ${PROD_ENGINE_PSW} ${NON_PROD_ENGINE_USR} ${NON_PROD_ENGINE_PSW} snapshot_dSource";    
             }
         } 
         stage("Refreshing masked VDB.") { 
