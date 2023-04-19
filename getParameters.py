@@ -86,6 +86,14 @@ def getAction(sourceID):
     action = responseJson["action"] 
     return action
 
+def getContainerID(containerName): 
+    APIQuery = os.popen(f'curl -X GET -k http://{dxEngineNonProd}/resources/json/delphix/selfservice/container -b "cookies.txt" -H "Content-Type: application/json"').read()
+    queryDict = json.loads(APIQuery)
+    for container in queryDict["result"]:
+        if container['name'] == containerName: 
+            containerReference = container["reference"]
+    return containerReference
+
 def checkActionLoop(action,engine):
     while True: 
         if checkAction(action,engine):
@@ -153,12 +161,12 @@ if __name__ == "__main__":
         action = getAction(specID)
         checkActionLoop(action,dxEngineProd)
     
-    if action == "refreshTemplate": 
-        print("Refreshing Non-Prod Template VDB.")
+    if action == "refreshContainer": 
+        print("Refreshing Non-Prod Container.")
         major,minor,micro = getAPIVersion(dxVersion)
         os.system(f"sh login.sh {non_prod_username} {non_prod_password} {dxEngineNonProd} {major} {minor} {micro}")
-        templateID_1 = getdSourceContainerID(templateVDBName_1,dxEngineNonProd)
-        templateID_2 = getdSourceContainerID(templateVDBName_2,dxEngineNonProd)
+        containerID_1 = getContainerID(containerName_1,dxEngineNonProd)
+        containerID_2 = getContainerID(containerName_2,dxEngineNonProd)
         os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID_1}")
         os.system(f"sh refreshVDBNonProd.sh {dxEngineNonProd} {templateID_2}")
         action_1 = getAction(templateID_1)
