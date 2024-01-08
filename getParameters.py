@@ -103,7 +103,7 @@ if __name__ == "__main__":
     if action == "snapshot_dSource": 
         print("Creating snapshot of dSource.")
         major,minor,micro = getAPIVersion(dxVersion) 
-        os.system(f"sh login.sh {prod_username} {prod_password} {dxEngineProd} {major} {minor} {micro}")
+        os.system(f"bat login.sh {prod_username} {prod_password} {dxEngineProd} {major} {minor} {micro}")
         sourceID_1 = getdSourceContainerID(dSourceName_1,dxEngineProd)
         sourceID_2 = getdSourceContainerID(dSourceName_2,dxEngineProd)
         os.system(f"sh snapshot.sh {dxEngineProd} {sourceID_1}")
