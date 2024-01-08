@@ -32,6 +32,7 @@ def getAPIVersion(delphixVersion):
 
 def getdSourceContainerID(dSourceName,engine): 
     APIQuery = os.popen(f'curl -X GET -k http://{engine}/resources/json/delphix/database -b "cookies.txt" -H "Content-Type: application/json"').read()
+    print(APIQuery)
     queryDict = json.loads(APIQuery) 
     for db in queryDict["result"]:
         if db['name'] == dSourceName: 
